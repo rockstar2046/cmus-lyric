@@ -9,6 +9,18 @@ With tmux
 ![](./png/a.png)
 
 
+# Install
+Linux
+
+`curl -L https://github.com/rockagen/cmus-lyric/raw/master/lyrics -o lyrics`
+
+MacOS
+
+`curl -L https://github.com/rockagen/cmus-lyric/raw/master/lyrics_osx -o lyrics`
+
+
+`chmod u+x lyrics`
+
 
 # How
 Check cmus current file exist lyric,fetch from music.163.com if not found
@@ -19,7 +31,7 @@ Check cmus current file exist lyric,fetch from music.163.com if not found
 `termui` term ui
 
 
-# Install
+# Build
 Install termui
 ```bash
 go get -u github.com/gizak/termui
