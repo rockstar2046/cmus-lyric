@@ -6,7 +6,6 @@ package pkg
 
 import (
 	"bytes"
-	"cmus-lyric.save/pkg"
 	ui "github.com/gizak/termui"
 	"io/ioutil"
 	"log"
@@ -27,7 +26,7 @@ func Listen(curFile string, curLyric map[int][]string, curPos int, keys []int) {
 			curLyric = loadLyrics(file)
 			if curLyric == nil {
 				drawEmpty()
-				pkg.FetchLyricCmus(file, dt)
+				FetchLyricCmus(file, dt)
 				curLyric = loadLyrics(file)
 				return
 			} else {
