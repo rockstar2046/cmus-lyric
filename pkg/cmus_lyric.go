@@ -6,10 +6,10 @@ package pkg
 
 import (
 	"bytes"
+	"cmus-lyric.save/pkg"
 	ui "github.com/gizak/termui"
 	"io/ioutil"
 	"log"
-	"netease/pkg"
 	"os"
 	"os/exec"
 	"regexp"
@@ -28,7 +28,7 @@ func Listen(curFile string, curLyric map[int][]string, curPos int, keys []int) {
 			if curLyric == nil {
 				drawEmpty()
 				pkg.FetchLyricCmus(file, dt)
-				curLyric =loadLyrics(file)
+				curLyric = loadLyrics(file)
 				return
 			} else {
 				keys = make([]int, 0, len(curLyric))
@@ -179,7 +179,7 @@ func cmusRemote() (int, string, int) {
 	}
 	info := strings.Split(out.String(), "\n")
 
-	if len(info) < 1{
+	if len(info) < 1 {
 		log.Fatal("cmus exited.")
 		os.Exit(-1)
 	}
