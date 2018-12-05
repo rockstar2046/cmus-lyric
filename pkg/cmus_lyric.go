@@ -6,9 +6,11 @@ package pkg
 
 import (
 	"bytes"
+	"fmt"
 	ui "github.com/gizak/termui"
 	"io/ioutil"
 	"log"
+	"netease/pkg"
 	"os/exec"
 	"regexp"
 	"sort"
@@ -81,32 +83,85 @@ func Listen(curFile string, curLyric map[int][]string, curPos int, keys []int) {
 				idx++
 			}
 		}
-		draw(list, cline)
+		drawL(list, cline)
 
 	} else {
 		drawEmpty()
 	}
 }
 
-func drawEmpty() {
-	draw([]string{"", "[no lyrics](fg-red)"}, 0)
+func Help() {
+	buf := bytes.Buffer{}
+	buf.WriteString("usage: \n\n")
+	buf.WriteString(" q or <C-c>: quit \n")
+	buf.WriteString(" m         : view comments \n")
+	buf.WriteString(" y         : view lyrics \n")
+	buf.WriteString(" ?         : help \n")
+	drawP("help", &buf)
 }
 
-func draw(list []string, cline int) {
+func DrawComments() {
+	_, file, dt := cmusRemote()
+	if len(file) < 1 {
+		drawL([]string{"", "[no comments](fg-red)"}, 0)
+		return
+	}
 
+	pathIdx := strings.LastIndexAny(file, ".")
+	titleIdx := strings.LastIndexAny(file, "/")
+	title := file[titleIdx+1 : pathIdx]
+
+	var buf bytes.Buffer
+
+	sid := pkg.FindId(title, dt)
+	if len(sid) > 0 {
+		hotc, c := pkg.GetHotComments(sid)
+		for _, v := range hotc {
+			buf.WriteString(fmt.Sprintf("%v [%v](fg-cyan)\n", v.LikedCount, v.Content))
+		}
+
+		buf.WriteString(fmt.Sprintf("\n\n"))
+
+		for _, v := range c {
+			buf.WriteString(fmt.Sprintf("%v  [%v](fg-cyan)\n", v.LikedCount, v.Content))
+		}
+
+	} else {
+		buf.WriteString("[no comments](fg-red)")
+	}
+
+	drawP(title, &buf)
+
+}
+
+func drawP(title string, buf *bytes.Buffer) {
+	p := ui.NewParagraph(buf.String())
+	p.PaddingTop = 2
+	p.Height = ui.TermHeight()
+	p.Width = ui.TermWidth()
+	p.BorderLabel = "[" + title + "](fg-white,bg-blue)"
+	p.Border = false
+	ui.Render(p)
+}
+
+func drawEmpty() {
+	drawL([]string{"", "[no lyrics](fg-red)"}, 0)
+}
+
+func drawL(list []string, cline int) {
 	height := ui.TermHeight()
 	ls := ui.NewList()
 	ls.BorderLabel = "[" + list[0] + "](fg-white,bg-blue)"
 	ls.PaddingTop = 2
 	ls.Height = height
-	ls.Width = 50
+	ls.Width = ui.TermWidth()
 	ls.Border = false
+
 	idx := 1
 	if cline+2 > height {
 		idx = cline - 1
 	}
 	ls.Items = list[idx:]
-
 	ui.Render(ls)
 }
 

@@ -29,20 +29,28 @@ func main() {
 
 	var keys []int
 
-	tick := time.Tick(500 * time.Millisecond)
+	duration := 500 * time.Millisecond
+	tick := time.NewTicker(duration)
 
 	uiEvents := ui.PollEvents()
 	for {
 		select {
-		case <-tick:
+		case <-tick.C:
 			pkg.Listen(curFile, curLyric, curPos, keys)
 		case e := <-uiEvents:
 			switch e.ID {
 			case "q", "<C-c>":
 				return
+			case "m":
+				tick.Stop()
+				pkg.DrawComments()
+			case "y":
+				tick = time.NewTicker(duration)
+			case "?":
+				tick.Stop()
+				pkg.Help()
 			}
 		}
-
 	}
 
 }

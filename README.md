@@ -8,6 +8,18 @@
 With tmux 
 ![](./png/a.png)
 
+more
+```bash
+usage:
+
+ q or <C-c>: quit
+ m         : view comments
+ y         : view lyrics
+ ?         : help
+
+
+```
+
 
 # Install
 Linux

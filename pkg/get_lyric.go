@@ -6,6 +6,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -16,14 +17,13 @@ import (
 	"strings"
 )
 
-
 const (
-	LyricApi    = "https://music.163.com/weapi/song/lyric?csrf_token="
-	SearchApi   = "http://music.163.com/weapi/cloudsearch/get/web?csrf_token="
-	Cookie      = "os=pc; osver=Microsoft-Windows-10-Professional-build-10586-64bit; appver=2.0.3.131777; channel=netease; __remember_me=true"
-	UserAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+	LyricApi   = "http://music.163.com/weapi/song/lyric?csrf_token="
+	SearchApi  = "http://music.163.com/weapi/cloudsearch/get/web?csrf_token="
+	CommentApi = "http://music.163.com/weapi/v1/resource/comments/R_SO_4_%v/?csrf_token="
+	Cookie     = "os=pc; osver=Microsoft-Windows-10-Professional-build-10586-64bit; appver=2.0.3.131777; channel=netease; __remember_me=true"
+	UserAgent  = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
 )
-
 
 type ReInfo struct {
 	Code int    `json:"code"`
@@ -47,16 +47,26 @@ type DesInfo struct {
 	ReInfo
 }
 
-
 type LrcInfo struct {
 	Lyric string `json:"lyric"`
 }
+
 type LyricInfo struct {
 	Lrc    LrcInfo `json:"lrc"`
 	Tlyric LrcInfo `json:"tlyric"`
 	ReInfo
 }
 
+type HotCommentInfo struct {
+	Content    string `json:"content"`
+	LikedCount int    `json:"likedCount"`
+}
+
+type CommentInfo struct {
+	HotCommentInfo []HotCommentInfo `json:"hotComments"`
+	CommentInfo    []HotCommentInfo `json:"comments"`
+	ReInfo
+}
 
 func FetchLyric(dir string, name string, duration int) {
 	sid := FindId(name, duration)
@@ -73,7 +83,6 @@ func FetchLyric(dir string, name string, duration int) {
 	}
 }
 
-
 func FetchLyricCmus(file string, dt int) {
 	pathIdx := strings.LastIndexAny(file, ".")
 	titleIdx := strings.LastIndexAny(file, "/")
@@ -81,10 +90,6 @@ func FetchLyricCmus(file string, dt int) {
 	title := file[titleIdx+1 : pathIdx]
 	FetchLyric(dir, title, dt)
 }
-
-
-
-
 
 func FindId(name string, duration int) string {
 
@@ -176,6 +181,45 @@ func GetLyric(id string) (string, string) {
 
 }
 
+func GetHotComments(id string) ([]HotCommentInfo, []HotCommentInfo) {
+
+	empty := make([]HotCommentInfo, 0)
+
+	m := make(map[string]interface{})
+
+	m["rid"] = ""
+	m["limit"] = 50
+	m["offset"] = 0
+	m["total"] = true
+	m["csrf_token"] = ""
+
+	req, _ := json.Marshal(m)
+	params, encSecKey, _ := EncParams(string(req))
+
+	resp, e := post(fmt.Sprintf(CommentApi, id), params, encSecKey)
+	if e != nil {
+		log.Println(e)
+		return empty, empty
+	}
+
+	ret := &CommentInfo{}
+
+	e2 := json.Unmarshal(resp, ret)
+
+	if e2 != nil {
+		log.Println(e2)
+		return empty, empty
+	}
+	code := ret.Code
+
+	if 200 != code {
+		log.Printf("code: %v, msg: %v \n", code, ret.Msg)
+		return empty, empty
+	}
+
+	return ret.HotCommentInfo, ret.CommentInfo
+}
+
 func post(_url, params, encSecKey string) ([]byte, error) {
 	client := &http.Client{}
 	form := url.Values{}
@@ -206,8 +250,7 @@ func post(_url, params, encSecKey string) ([]byte, error) {
 	return resBody, nil
 }
 
-
-func save(path string, src io.Reader){
+func save(path string, src io.Reader) {
 	out, err := os.Create(path)
 	defer out.Close()
 	if err != nil {
