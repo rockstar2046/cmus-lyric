@@ -9,7 +9,6 @@ import (
 	ui "github.com/gizak/termui"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
 	"regexp"
 	"sort"
@@ -173,14 +172,12 @@ func cmusRemote() (int, string, int) {
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal("cmus exited.")
-		os.Exit(-1)
+		log.Fatalf("\n\n> cmus not running.\n\n")
 	}
 	info := strings.Split(out.String(), "\n")
 
-	if len(info) < 1 {
-		log.Fatal("cmus exited.")
-		os.Exit(-1)
+	if len(info) < 1 || len(info[0]) < 1 {
+		log.Fatalf("\n\n> cmus not running.\n\n")
 	}
 	//status stopped
 	status := strings.Split(info[0], " ")[1]

@@ -102,7 +102,7 @@ func FindId(name string, duration int) string {
 
 	resp, e := post(SearchApi, params, encSecKey)
 	if e != nil {
-		log.Fatal(e)
+		log.Println(e)
 		return ""
 	}
 
@@ -111,13 +111,13 @@ func FindId(name string, duration int) string {
 	e2 := json.Unmarshal(resp, ret)
 
 	if e2 != nil {
-		log.Fatal(e2)
+		log.Println(e2)
 		return ""
 	}
 	code := ret.Code
 
 	if 200 != code {
-		log.Fatalf("code: %v, msg: %v", code, ret.Msg)
+		log.Printf("code: %v, msg: %v \n", code, ret.Msg)
 		return ""
 	}
 
@@ -151,7 +151,7 @@ func GetLyric(id string) (string, string) {
 
 	resp, e := post(LyricApi, params, encSecKey)
 	if e != nil {
-		log.Fatal(e)
+		log.Println(e)
 		return lyrc, tlyrc
 	}
 
@@ -160,7 +160,7 @@ func GetLyric(id string) (string, string) {
 	e2 := json.Unmarshal(resp, result)
 
 	if e2 != nil {
-		log.Fatal(e2)
+		log.Println(e2)
 		return lyrc, tlyrc
 	}
 
@@ -168,7 +168,7 @@ func GetLyric(id string) (string, string) {
 	code := result.Code
 
 	if 200 != code {
-		log.Fatalf("code: %v, msg: %v", code, result.Msg)
+		log.Printf("code: %v, msg: %v \n", code, result.Msg)
 		return lyrc, tlyrc
 	}
 	lyrc, tlyrc = result.Lrc.Lyric, result.Tlyric.Lyric
@@ -194,13 +194,13 @@ func post(_url, params, encSecKey string) ([]byte, error) {
 	resp, err := client.Do(request)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 	resBody, resErr := ioutil.ReadAll(resp.Body)
 	if resErr != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, resErr
 	}
 	return resBody, nil
@@ -211,12 +211,12 @@ func save(path string, src io.Reader){
 	out, err := os.Create(path)
 	defer out.Close()
 	if err != nil {
-		log.Fatalf("Write eror: %v", err)
+		log.Printf("Write eror: %v \n", err)
 		return
 	}
 	n, err := io.Copy(out, src)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	log.Printf("<- %v, size: %v", path, n)
 }
