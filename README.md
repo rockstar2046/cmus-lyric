@@ -3,12 +3,15 @@
 
 
 # Like
-![](./png/b.png)
+![](https://i.imgur.com/WNxuUZ7.png)
 
 With tmux 
-![](./png/a.png)
+![](https://i.imgur.com/wL3tPZa.png)
 
-more
+With comments
+![](https://i.imgur.com/UUUf9lZ.png)
+
+help
 ```bash
 usage:
 
