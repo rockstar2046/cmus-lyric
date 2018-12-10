@@ -7,8 +7,6 @@ package main
 import (
 	"cmus-lyric/pkg"
 	ui "github.com/gizak/termui"
-)
-import (
 	"log"
 	"time"
 )
@@ -22,12 +20,7 @@ func main() {
 
 	defer ui.Close()
 
-	var curFile string
-
-	var curLyric map[int][]string
-	var curPos int
-
-	var keys []int
+	info := new(pkg.CmusInfo)
 
 	duration := 500 * time.Millisecond
 	tick := time.NewTicker(duration)
@@ -36,7 +29,7 @@ func main() {
 	for {
 		select {
 		case <-tick.C:
-			pkg.Listen(curFile, curLyric, curPos, keys)
+			pkg.Listen(info)
 		case e := <-uiEvents:
 			switch e.ID {
 			case "q", "<C-c>":

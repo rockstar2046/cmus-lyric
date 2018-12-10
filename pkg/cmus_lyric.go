@@ -18,50 +18,62 @@ import (
 	"strings"
 )
 
-func Listen(curFile string, curLyric map[int][]string, curPos int, keys []int) {
+type CmusInfo struct {
+	CurFile  string
+	CurLyric map[int][]string
+	CurPos   int
+	Pkeys    []int
+}
+
+func Listen(info *CmusInfo) {
 
 	pos, file, dt := cmusRemote()
 	if pos > 0 {
-		if curFile != file {
-			curFile = file
-			curLyric = loadLyrics(file)
+		if info.CurFile != file {
+			info.CurFile = file
+			curLyric := loadLyrics(file)
 			if curLyric == nil {
-				drawEmpty()
+				log.Println("fetching..")
 				FetchLyricCmus(file, dt)
 				curLyric = loadLyrics(file)
-				return
-			} else {
-				keys = make([]int, 0, len(curLyric))
-				for k := range curLyric {
-					keys = append(keys, k)
-				}
-				sort.Ints(keys)
 			}
+			pkeys := make([]int, 0, len(curLyric))
+			for k := range curLyric {
+				pkeys = append(pkeys, k)
+			}
+			sort.Ints(pkeys)
+			info.Pkeys = pkeys
+			info.CurLyric = curLyric
 		}
 
+		if info.CurLyric == nil {
+			drawEmpty()
+			return
+		}
 		var tmpPos int
-		for i, n := range keys {
+		for i, n := range info.Pkeys {
 			if pos < n {
-				tmpPos = keys[i-1]
+				tmpPos = info.Pkeys[i-1]
 				break
 			}
 		}
-		if curPos == tmpPos && curPos != 0 {
+		if info.CurPos == tmpPos && info.CurPos != 0 {
 			return
 
 		}
 
-		curPos = tmpPos
+		info.CurPos = tmpPos
 
-		list := make([]string, 2*len(keys))
+		list := make([]string, 2*len(info.Pkeys))
 
 		idx, cline := 0, 0
 
-		for _, v := range keys {
+		for _, v := range info.Pkeys {
 
-			data := curLyric[v]
-
-			if curPos == v && v != 0 {
+			_data := info.CurLyric[v]
+			data := make([]string, len(_data))
+			copy(data, _data)
+			if info.CurPos == v && v != 0 {
 
 				text := data[0]
 
@@ -135,6 +147,7 @@ func DrawComments() {
 }
 
 func drawP(title string, buf *bytes.Buffer) {
+	ui.Clear()
 	p := ui.NewParagraph(buf.String())
 	p.PaddingTop = 2
 	p.Height = ui.TermHeight()
@@ -182,9 +195,9 @@ func loadLyrics(path string) map[int][]string {
 	// translate lyric
 	var tlines []string
 	lines := strings.Split(string(content), "\n")
-	t_content, e := ioutil.ReadFile(tlpath)
+	tcontent, e := ioutil.ReadFile(tlpath)
 	if e == nil {
-		tlines = strings.Split(string(t_content), "\n")
+		tlines = strings.Split(string(tcontent), "\n")
 	}
 
 	m := make(map[int][]string)

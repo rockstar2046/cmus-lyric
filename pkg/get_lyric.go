@@ -261,5 +261,5 @@ func save(path string, src io.Reader) {
 	if err != nil {
 		log.Println(err)
 	}
-	log.Printf("<- %v, size: %v", path, n)
+	log.Printf("<- %v, size: %v\n", path, n)
 }
