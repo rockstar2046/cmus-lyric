@@ -47,7 +47,7 @@ Check cmus current file exist lyric,fetch from music.163.com if not found
 
 
 # Build
-Install termui
+Install lyrics
 ```bash
 make install
 ```
