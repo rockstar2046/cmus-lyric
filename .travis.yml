@@ -1,0 +1,12 @@
+sudo: false
+language: go
+go:
+ - 1.11.x
+ - master
+before_install:
+ - ln  -s $TRAVIS_BUILD_DIR $GOPATH/src/
+ - make deps
+script:
+ - make build-all
+notification:
+    email:false

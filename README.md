@@ -1,6 +1,7 @@
 # cmus-lyric
 [cmus](https://cmus.github.io/) lyrics [viewer](https://asciinema.org/a/69vGAibC1uvkDBR7WuSecbydd)
 
+![](https://api.travis-ci.org/rockagen/cmus-lyric.svg?branch=master)
 
 # Like
 ![](https://i.imgur.com/WNxuUZ7.png)
