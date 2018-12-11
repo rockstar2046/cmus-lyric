@@ -49,13 +49,9 @@ Check cmus current file exist lyric,fetch from music.163.com if not found
 # Build
 Install termui
 ```bash
-go get -u github.com/gizak/termui
+make install
 ```
 
-Build
-```bash
-go build cmd/lyrics.go
-```
 
 # Run
 `./lyrics`
