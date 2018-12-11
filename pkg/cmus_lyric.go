@@ -10,7 +10,6 @@ import (
 	ui "github.com/gizak/termui"
 	"io/ioutil"
 	"log"
-	"netease/pkg"
 	"os/exec"
 	"regexp"
 	"sort"
@@ -125,9 +124,9 @@ func DrawComments() {
 
 	var buf bytes.Buffer
 
-	sid := pkg.FindId(title, dt)
+	sid := FindId(title, dt)
 	if len(sid) > 0 {
-		hotc, c := pkg.GetHotComments(sid)
+		hotc, c := GetHotComments(sid)
 		for _, v := range hotc {
 			buf.WriteString(fmt.Sprintf("%v [%v](fg-cyan)\n", v.LikedCount, v.Content))
 		}
